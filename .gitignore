@@ -1,0 +1,7 @@
+__pycache__/
+.env
+*.log
+*.sqlite
+.DS_Store
+venv/
+raw_reviews.csv
