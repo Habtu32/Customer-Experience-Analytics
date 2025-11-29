@@ -1,2 +1,6 @@
 google-play-scraper
 pandas
+transformers
+torch
+tqdm
+vaderSentiment
