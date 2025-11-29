@@ -1,6 +1,4 @@
-import os
 import pandas as pd
-import transformers
 from transformers import pipeline
 
 ## Import cleaned file
@@ -14,7 +12,13 @@ def analyze_sentiment(review_text):
     if not isinstance(review_text, str):
         return {'label': 'UNKNOWN', 'score': 0.0} # Handle non-string entries
     # The pipeline returns a list of dictionaries, we want the first (and only) element
-    return sentiment_analyzer(review_text)[0]
+    result = sentiment_analyzer(review_text)[0]
+
+    # Classify as 'NEUTRAL' if the score is below 0.6
+    if result['score'] < 0.6:
+        result['label'] = 'NEUTRAL'
+
+    return result
 
 # Apply the function to the 'review' column and store the results in a new column
 df_cleaned['sentiment_results'] = df_cleaned['review'].apply(analyze_sentiment)
@@ -26,16 +30,18 @@ df_cleaned['sentiment_score'] = df_cleaned['sentiment_results'].apply(lambda x: 
 # Remove the intermediate 'sentiment_results' column
 df_cleaned = df_cleaned.drop(columns=['sentiment_results'])
 
-# Calculate sentiment distribution per bank
+# Calculate sentiment distribution per bank, now including neutral
 sentiment_by_bank = df_cleaned.groupby('bank').agg(
     total_reviews=('review', 'count'),
     positive_count=('sentiment_label', lambda x: (x == 'POSITIVE').sum()),
     negative_count=('sentiment_label', lambda x: (x == 'NEGATIVE').sum()),
+    neutral_count=('sentiment_label', lambda x: (x == 'NEUTRAL').sum()),
     average_sentiment_score=('sentiment_score', 'mean')
 )
 
 sentiment_by_bank['positive_percentage'] = (sentiment_by_bank['positive_count'] / sentiment_by_bank['total_reviews']) * 100
 sentiment_by_bank['negative_percentage'] = (sentiment_by_bank['negative_count'] / sentiment_by_bank['total_reviews']) * 100
+sentiment_by_bank['neutral_percentage'] = (sentiment_by_bank['neutral_count'] / sentiment_by_bank['total_reviews']) * 100
 
 # Display the final sentiment by bank results
 print(sentiment_by_bank)
