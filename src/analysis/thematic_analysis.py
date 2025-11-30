@@ -7,7 +7,7 @@ import string
 
 # --- 1. Load Data ---
 # Assuming 'cleaned_reviews_final.csv' is the initial cleaned data source
-df = pd.read_csv('/content/cleaned_reviews_final.csv')
+df = pd.read_csv('../../data/processed/cleaned_reviews_final.csv')
 print("DataFrame 'df' loaded successfully.")
 
 # --- 2. Load spaCy Model and Define Preprocessing Functions ---
@@ -16,7 +16,6 @@ try:
     print("spaCy 'en_core_web_sm' model loaded successfully.")
 except OSError:
     print("Downloading spaCy 'en_core_web_sm' model...")
-    !python -m spacy download en_core_web_sm
     nlp = spacy.load('en_core_web_sm')
     print("spaCy 'en_core_web_sm' model downloaded and loaded successfully.")
 
