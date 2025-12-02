@@ -34,3 +34,60 @@ This project analyzes user reviews from mobile banking apps of three Ethiopian b
 ## Usage / Next Steps
 - `clean_reviews_final.csv` will be used for **Task-2 Sentiment & Thematic Analysis**
 - Ensure you load it in your analysis scripts for NLP processing
+
+## 📊 Task 3 – Database Setup (PostgreSQL)
+
+### 1. Database Schema
+
+The project uses two tables:
+
+### **banks**
+Stores metadata for each bank.
+| Column | Type | Description |
+|--------|------|-------------|
+| bank_id | SERIAL PK | Unique ID for each bank |
+| bank_name | VARCHAR | Name of the bank |
+| app_name | VARCHAR | Name of the mobile app |
+
+### **reviews**
+Stores all cleaned and processed review data.
+| Column | Type | Description |
+|--------|------|-------------|
+| review_id | SERIAL PK | Unique review ID |
+| bank_id | INT FK | Links to banks table |
+| review_text | TEXT | Original review text |
+| rating | INT | Star rating |
+| review_date | DATE | Review date |
+| sentiment_label | VARCHAR | Positive/Negative/Neutral |
+| sentiment_score | FLOAT | Model score |
+| source | VARCHAR | App store source |
+| cleaned_review | TEXT | Cleaned version |
+| lemmatized | TEXT | Lemmatized version |
+| topic | INT | LDA topic label |
+| theme | VARCHAR | Final manual theme |
+
+The full schema is stored in `database/schema.sql`.
+
+---
+
+### 2. Insert Script
+
+A Python script (`database/insert_data.py`) loads cleaned CSV data and inserts it using psycopg2.
+
+### 3. Verification Queries
+
+Examples used to validate data integrity:
+
+```sql
+-- Count reviews
+SELECT COUNT(*) FROM reviews;
+
+-- Reviews per bank
+SELECT bank_id, COUNT(*) 
+FROM reviews 
+GROUP BY bank_id;
+
+-- Average rating per bank
+SELECT bank_id, AVG(rating)
+FROM reviews
+GROUP BY bank_id;
